@@ -37,4 +37,3 @@ class FileDialog(QWidget):
             self, "Open File", "", "All Files (*);;Python Files (*.py)", options=options)
         if fileName:
             self.le.setText(fileName)
-
