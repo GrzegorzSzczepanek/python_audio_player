@@ -6,4 +6,4 @@ def open_file(self):
     fileName, _ = QFileDialog.getOpenFileName(
         self, "Open File", "", "All Files (*);;Python Files (*.py)", options=options)
     if fileName:
-        self.le.setText(fileName)
+        print(fileName)

@@ -68,36 +68,39 @@ class MusicPlayer(QWidget):
             f"{position // 60000}:{'0' if (position // 1000) % 60 < 10 else ''}{(position // 1000) % 60}")
 
 
-class SongWidget(QWidget):
+class SongButton(QWidget):
     clicked = pyqtSignal()
 
     def __init__(self, text="", parent=None, styles=None):
         super().__init__(parent)
 
         self.layout = QVBoxLayout(self)
-        self.layout.setAlignment(Qt.AlignCenter)
-        self.label = QLabel(text)
-        self.label.setAlignment(Qt.AlignCenter)
+
+        self.button = QPushButton(text)
+        self.button.clicked.connect(self.on_button_clicked)
         if styles:
-            self.label.setStyleSheet(styles)
+            self.button.setStyleSheet(styles)
         else:
-            self.label.setStyleSheet("""
-                QLabel {
+            self.button.setStyleSheet("""
+                QPushButton {
                     border: 1px solid black;
                     border-radius: 10px;
                     padding: 10px;
                     margin: 0px;
+                    margin-bottom:100px;
                 }
             """)
 
-        self.layout.addWidget(self.label)
-        parent_width = parent.width()
-        self.setMinimumWidth(parent_width - 20)
-        self.setMinimumHeight(self.label.sizeHint().height() + 20)
+        self.layout.addWidget(self.button)
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # Set minimum width and height based on the button's size hint
+        self.setMinimumWidth(self.button.sizeHint().width() + 20)
+        self.setMinimumHeight(self.button.sizeHint().height() + 20)
 
-    def mousePressEvent(self, event):
+        # Set size policy if needed
+        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+    def on_button_clicked(self):
         self.clicked.emit()
 
 
