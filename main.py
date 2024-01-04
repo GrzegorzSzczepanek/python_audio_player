@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from gui_elements import MainWindow, SongButton
+from gui_elements import MainWindow, SongButton, MusicPlayer
 from file_functions import open_file
 # songs save path: HOME/.local/share
 
@@ -18,8 +18,7 @@ def main():
                     margin-top: 40px;
                 }
             """)
-    file_dialog.clicked.connect(lambda: open_file(file_dialog))
-
+    file_dialog.clicked.connect(lambda: open_file(file_dialog, main_window))
     main_window.show()
     app.exec_()
 

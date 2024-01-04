@@ -86,8 +86,7 @@ class SongButton(QWidget):
                     border: 1px solid black;
                     border-radius: 10px;
                     padding: 10px;
-                    margin: 0px;
-                    margin-bottom:100px;
+                    margin: 20px;
                 }
             """)
 
@@ -105,38 +104,18 @@ class SongButton(QWidget):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, central_widget=None, parent=None):
+    def __init__(self, widgets=None, parent=None):
         super().__init__()
 
         self.setWindowTitle("Python Music Player")
-        self.resize(500, 500)
-        self.resize(300, 300)
-        button = QPushButton("Test BTn")
+        self.setGeometry(100, 100, 500, 500)
 
-        # if central_widget:
-        #     self.setCentralWidget(central_widget)
-        # else:
-        #     self.setCentralWidget(button)
+        main_layout = QVBoxLayout(self)
 
+        if widgets is None:
+            central_widget = QWidget(self)
+            self.setCentralWidget(central_widget)
+        else:
+            for widget in widgets:
+                main_layout.addWidget(widget)
 
-# class FileDialog(QWidget):
-#     def __init__(self, parent=None):
-#         super(FileDialog, self).__init__(parent)
-#
-#         self.button = QPushButton("Play a song")
-#         self.button.clicked.connect(self.open_file)
-#
-#         layout = QVBoxLayout()
-#         layout.addWidget(self.button)
-#
-#         self.le = QLabel("Song Path")
-#         self.setLayout(layout)
-#         self.setWindowTitle("Song Picker")
-#
-#     def open_file(self):
-#         options = QFileDialog.Options()
-#         options |= QFileDialog.ReadOnly
-#         fileName, _ = QFileDialog.getOpenFileName(
-#             self, "Open File", "", "All Files (*);;Python Files (*.py)", options=options)
-#         if fileName:
-#             self.le.setText(fileName)
