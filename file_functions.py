@@ -1,14 +1,14 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy
-from gui_elements import MusicPlayer
 
 
-def open_file(self, main_window):
+def open_file(self, parent, music_player):
     options = QFileDialog.Options()
     options |= QFileDialog.ReadOnly
     file_name, _ = QFileDialog.getOpenFileName(
         self, "Open File", "", "All Files (*);;Python Files (*.py)", options=options)
     if file_name:
-        player = MusicPlayer()
+        parent.replace_widgets_to_player()
+        player = music_player
         player.setUrl(file_name)
-        main_window.setCentralWidget(player)
+        parent.layout().addWidget(player)
         print(file_name)
