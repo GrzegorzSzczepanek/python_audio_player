@@ -1,14 +1,13 @@
 from PyQt5.QtWidgets import QApplication
 from gui_elements import MainWindow, SongButton, MusicPlayer
-from file_functions import open_file
-# songs save path: HOME/.local/share
+from file_functions import open_file, open_directory, check_playlists_path
 
 
 def main():
     app = QApplication([])
 
     main_window = MainWindow()
-
+    check_playlists_path()
     main_window.show()
     app.exec_()
 

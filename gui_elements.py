@@ -1,4 +1,4 @@
-from file_functions import open_file
+from file_functions import open_file, open_directory, check_playlists_path
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -6,10 +6,11 @@ from PyQt5.QtCore import Qt, QUrl, QTimer, pyqtSignal
 
 
 class MusicPlayer(QWidget):
-    def __init__(self):
+    def __init__(self, max_width, max_height):
         super().__init__()
 
-        self.setMaximumHeight(200)
+        self.setMaximumHeight(max_height)
+        self.setMaximumWidth(max_width)
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVideoOutput(QVideoWidget())
@@ -20,12 +21,14 @@ class MusicPlayer(QWidget):
         self.slider = QSlider(Qt.Horizontal)
         self.slider.sliderMoved.connect(self.setPosition)
 
-        self.label = QLabel()
+        self.time_label = QLabel()
+        self.song_label = QLabel()
 
         layout = QVBoxLayout()
+        layout.addWidget(self.song_label)
         layout.addWidget(self.playButton)
         layout.addWidget(self.slider)
-        layout.addWidget(self.label)
+        layout.addWidget(self.time_label)
 
         self.setLayout(layout)
 
@@ -41,6 +44,9 @@ class MusicPlayer(QWidget):
         self.play()
 
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)
+
+        song_name = url.split("/")[-1]
+        self.song_label.setText(song_name)
 
     def onMediaStatusChanged(self, status):
         if status == QMediaPlayer.LoadedMedia:
@@ -67,7 +73,7 @@ class MusicPlayer(QWidget):
         position = self.mediaPlayer.position()
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)  # Update maximum dynamically
         self.slider.setValue(position // 1000)
-        self.label.setText(
+        self.time_label.setText(
             f"{position // 60000}:{'0' if (position // 1000) % 60 < 10 else ''}{(position // 1000) % 60}")
 
 
@@ -88,6 +94,7 @@ class SongButton(QWidget):
                 QPushButton {
                     border: 1px solid black;
                     border-radius: 10px;
+                    width: 100%;
                     padding: 10px;
                     margin: 20px;
                 }
@@ -99,11 +106,13 @@ class SongButton(QWidget):
         self.setMinimumWidth(self.button.sizeHint().width() + 20)
         self.setMinimumHeight(self.button.sizeHint().height() + 20)
 
-        # Set size policy if needed
-        # self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
     def on_button_clicked(self):
         self.clicked.emit()
+
+
+def PlaylistWidget(QWidget):
+    def __init__(self, text="Placeholder Text", parent=None, styles=None):
+        super().__init__(parent)
 
 
 class MainWindow(QMainWindow):
@@ -112,29 +121,34 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Python Music Player")
-        self.setGeometry(100, 100, 500, 500)
+        self.width, self.height = 500, 500
+        self.resize(self.width, self.height)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
         self.main_layout = QVBoxLayout(self.central_widget)
 
-        self.music_player = MusicPlayer()
+        self.max_width = int(self.width)
+        self.max_height = int(self.height * 0.22)
+        self.music_player = MusicPlayer(self.max_width, self.max_height)
+
         self.make_widgets()
 
-    def replace_player_to_widgets(self):
-        # Remove all widgets from the layout
+    def remove_widgets(self):
         for i in reversed(range(self.main_layout.count())):
             self.main_layout.itemAt(i).widget().setParent(None)
+
+    def replace_player_to_widgets(self):
+        self.remove_widgets()
+
         self.main_layout.removeWidget(self.music_player)
         self.music_player.setParent(None)
         self.music_player = None
         self.make_widgets()
 
     def replace_widgets_to_player(self):
-        # Remove all widgets from the layout
-        for i in reversed(range(self.main_layout.count())):
-            self.main_layout.itemAt(i).widget().setParent(None)
+        self.remove_widgets()
 
         self.main_layout.addWidget(self.music_player)
         self.back_to_menu_button = SongButton("Go Back", parent=self)
@@ -142,20 +156,21 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.back_to_menu_button)
 
     def make_widgets(self):
-        self.song_widget = SongButton("your songs", parent=self)
-        self.song_widget.clicked.connect(lambda: self.replace_widgets())
+        self.song_widget = SongButton("Your playlists", parent=self)
+        self.song_widget.clicked.connect(lambda: self.show_playlists())
 
-        self.file_dialog = SongButton("Pick a song", parent=self, styles="""
-                    QPushButton {
-                        border: 1px solid black;
-                        border-radius: 10px;
-                        padding: 10px;
-                        margin-top: 40px;
-                        width: 100%;
-                    }
-                """)
-        self.music_player = MusicPlayer()
+        self.file_dialog = SongButton("Play a song", parent=self)
+        self.music_player = MusicPlayer(max_width=self.max_width, max_height=self.max_height)
         self.file_dialog.clicked.connect(lambda: open_file(self.file_dialog, self, self.music_player))
 
         self.main_layout.addWidget(self.song_widget)
         self.main_layout.addWidget(self.file_dialog)
+
+    def show_playlists(self):
+        self.remove_widgets()
+        playlists_names = check_playlists_path()
+        if playlists_names:
+            for playlists_name in playlists_names:
+                self.main_layout.addWidget(SongButton(playlists_name, parent=self))
+        else:
+            pass
