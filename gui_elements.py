@@ -1,4 +1,4 @@
-from file_functions import open_file, open_directory, check_playlists_path
+from file_functions import open_file, open_directory, check_playlists_path, add_playlist, get_playlist_songs
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -166,11 +166,25 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.song_widget)
         self.main_layout.addWidget(self.file_dialog)
 
+    def display_playlist_songs(self, playlists_name):
+        songs = get_playlist_songs(playlists_name)
+        print(songs)
+        return
+
     def show_playlists(self):
         self.remove_widgets()
         playlists_names = check_playlists_path()
+
+        self.add_playlist_button = SongButton("Add new playlist", parent=self)
+        self.add_playlist_button.clicked.connect(lambda: add_playlist(open_directory(self)))
+        self.main_layout.addWidget(self.add_playlist_button)
+
+        self.back_to_menu_button = SongButton("Go Back", parent=self)
+        self.back_to_menu_button.clicked.connect(lambda: self.replace_player_to_widgets())
+        self.main_layout.addWidget(self.back_to_menu_button)
+
         if playlists_names:
             for playlists_name in playlists_names:
-                self.main_layout.addWidget(SongButton(playlists_name, parent=self))
-        else:
-            pass
+                playlist_button = SongButton(playlists_name, parent=self)
+                playlist_button.clicked.connect(lambda: self.display_playlist_songs(playlists_name))
+                self.main_layout.addWidget(playlist_button)
