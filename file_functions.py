@@ -2,17 +2,21 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPu
 import os
 
 
+def start_music_player(parent, file_name, music_player):
+    parent.replace_widgets_to_player()
+    player = music_player
+    player.setUrl(file_name)
+    parent.layout().addWidget(player)
+    print(file_name)
+
+
 def open_file(self, parent, music_player):
     options = QFileDialog.Options()
     options |= QFileDialog.ReadOnly
     file_name, _ = QFileDialog.getOpenFileName(
-        self, "Open File", "", "Audio Files (*.wav *.mp3 *.flac)", options=options)
+        self, "Open File", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)", options=options)
     if file_name:
-        parent.replace_widgets_to_player()
-        player = music_player
-        player.setUrl(file_name)
-        parent.layout().addWidget(player)
-        print(file_name)
+        start_music_player()
 
 
 def open_directory(self):
@@ -46,9 +50,10 @@ def add_playlist(new_playlist_path):
     playlists_file = "playlists.txt"
     playlists_path = os.path.join(playlists_path, playlists_file)
 
-    with open(playlists_path, "a") as file:
+    with open(playlists_path, "r") as file:
         if new_playlist_path not in file.read():
-            file.write(f"{new_playlist_path}\n")
+            with open(playlists_path, "a") as append_file:
+                append_file.write(f"{new_playlist_path}\n")
 
 
 def get_playlist_songs(name):

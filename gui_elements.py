@@ -1,5 +1,5 @@
-from file_functions import open_file, open_directory, check_playlists_path, add_playlist, get_playlist_songs
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox
+from file_functions import open_file, open_directory, check_playlists_path, add_playlist, get_playlist_songs, start_music_player
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox, QScrollArea
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl, QTimer, pyqtSignal
@@ -127,6 +127,10 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
+        # self.scroll_area = QScrollArea(self)
+        # self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # self.setCentralWidget(self.scroll_area)
+
         self.main_layout = QVBoxLayout(self.central_widget)
 
         self.max_width = int(self.width)
@@ -166,10 +170,21 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.song_widget)
         self.main_layout.addWidget(self.file_dialog)
 
+    def replace_songs_to_playlists(self):
+        self.remove_widgets()
+        self.show_playlists()
+
     def display_playlist_songs(self, playlists_name):
+        self.back_to_playlist_button = SongButton("Go Back", parent=self)
+        self.back_to_playlist_button.clicked.connect(lambda: self.replace_songs_to_playlists())
+
         songs = get_playlist_songs(playlists_name)
-        print(songs)
-        return
+        self.remove_widgets()
+        for song in songs:
+            full_song_path = f"{playlists_name}/{song}"
+            song_button = SongButton(song, parent=self)
+            song_button.clicked.connect(lambda: start_music_player(self, full_song_path, self.music_player))
+            self.main_layout.addWidget(song_button)
 
     def show_playlists(self):
         self.remove_widgets()
