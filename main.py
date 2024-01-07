@@ -7,7 +7,6 @@ def main():
     app = QApplication([])
 
     main_window = MainWindow()
-    check_playlists_path()
     main_window.show()
     app.exec_()
 

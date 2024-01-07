@@ -127,10 +127,6 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        # self.scroll_area = QScrollArea(self)
-        # self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # self.setCentralWidget(self.scroll_area)
-
         self.main_layout = QVBoxLayout(self.central_widget)
 
         self.max_width = int(self.width)
@@ -183,7 +179,7 @@ class MainWindow(QMainWindow):
         for song in songs:
             full_song_path = f"{playlists_name}/{song}"
             song_button = SongButton(song, parent=self)
-            song_button.clicked.connect(lambda: start_music_player(self, full_song_path, self.music_player))
+            song_button.clicked.connect(lambda path=full_song_path: start_music_player(self, path, self.music_player))
             self.main_layout.addWidget(song_button)
 
     def show_playlists(self):
@@ -201,5 +197,5 @@ class MainWindow(QMainWindow):
         if playlists_names:
             for playlists_name in playlists_names:
                 playlist_button = SongButton(playlists_name, parent=self)
-                playlist_button.clicked.connect(lambda: self.display_playlist_songs(playlists_name))
+                playlist_button.clicked.connect(lambda playlist=playlists_name: self.display_playlist_songs(playlist))
                 self.main_layout.addWidget(playlist_button)

@@ -16,7 +16,7 @@ def open_file(self, parent, music_player):
     file_name, _ = QFileDialog.getOpenFileName(
         self, "Open File", "", "Audio Files (*.wav *.mp3 *.flac *.ogg)", options=options)
     if file_name:
-        start_music_player()
+        start_music_player(parent, file_name, music_player)
 
 
 def open_directory(self):
