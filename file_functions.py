@@ -5,7 +5,7 @@ import os
 def start_music_player(parent, file_name, music_player):
     parent.replace_widgets_to_player()
     player = music_player
-    player.setUrl(file_name)
+    player.set_path(file_name)
     parent.layout().addWidget(player)
     print(file_name)
 
@@ -45,7 +45,7 @@ def check_playlists_path():
         return None
 
 
-def add_playlist(new_playlist_path):
+def add_playlist(self, new_playlist_path):
     playlists_path = os.path.expanduser("~/.local/share/PyPlayer/")
     playlists_file = "playlists.txt"
     playlists_path = os.path.join(playlists_path, playlists_file)
@@ -54,6 +54,9 @@ def add_playlist(new_playlist_path):
         if new_playlist_path not in file.read():
             with open(playlists_path, "a") as append_file:
                 append_file.write(f"{new_playlist_path}\n")
+
+    self.remove_widgets()
+    self.show_playlists()
 
 
 def get_playlist_songs(name):
@@ -69,3 +72,23 @@ def get_playlist_songs(name):
     audio_files = [file for file in all_files if any(file.lower().endswith(ext) for ext in audio_extensions)]
 
     return audio_files
+
+
+def remove_playlist(playlist_to_delete):
+    playlists_path = os.path.expanduser("~/.local/share/PyPlayer/")
+    playlists_file = "playlists.txt"
+    playlists_path = os.path.join(playlists_path, playlists_file)
+
+    try:
+        with open(playlists_path, 'r') as file:
+            playlists = file.readlines()
+
+        # Remove the specified playlist path
+        playlists = [playlist.strip() for playlist in playlists if playlist.strip() != playlist_to_delete]
+
+        with open(playlists_path, 'w') as file:
+            file.write('\n'.join(playlists))
+
+        print(f"Playlist path '{playlist_to_delete}' deleted successfully.")
+    except Exception as e:
+        print(f"Error deleting playlist path: {str(e)}")

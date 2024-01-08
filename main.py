@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication
-from gui_elements import MainWindow, SongButton, MusicPlayer
-from file_functions import open_file, open_directory, check_playlists_path
+from main_window import MainWindow
+from file_functions import remove_playlist
 
 
 def main():
