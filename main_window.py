@@ -34,10 +34,12 @@ class MainWindow(QMainWindow):
 
         self.make_widgets()
 
-    # TODO add more backbuttons in songs
     def remove_widgets(self):
         for i in reversed(range(self.main_layout.count())):
             self.main_layout.itemAt(i).widget().setParent(None)
+
+    def reset_player(self):
+        pass
 
     def replace_player_to_widgets(self):
         self.remove_widgets()
@@ -47,12 +49,22 @@ class MainWindow(QMainWindow):
         self.music_player = None
         self.make_widgets()
 
-    def replace_widgets_to_player(self):
+    def song_back_button(self, playlist):
+        self.main_layout.removeWidget(self.music_player)
+        self.music_player.setParent(None)
+        self.music_player = None
+        self.music_player = AudioPlayer(self.max_width, self.max_height)
+        self.display_playlist_songs(playlist)
+
+    def replace_widgets_to_player(self, playlist=None):
         self.remove_widgets()
 
         self.main_layout.addWidget(self.music_player)
         self.back_to_menu_button = SongButton("Go Back", parent=self)
-        self.back_to_menu_button.clicked.connect(lambda: self.replace_player_to_widgets())
+        if playlist:
+            self.back_to_menu_button.clicked.connect(lambda: self.song_back_button(playlist))
+        else:
+            self.back_to_menu_button.clicked.connect(lambda: self.replace_player_to_widgets())
         self.main_layout.addWidget(self.back_to_menu_button)
 
     def make_widgets(self):
@@ -90,7 +102,10 @@ class MainWindow(QMainWindow):
         for song in songs:
             full_song_path = f"{playlists_name}/{song}"
             song_button = SongButton(song, parent=self)
-            song_button.clicked.connect(lambda path=full_song_path: start_music_player(self, path, self.music_player))
+            song_button.clicked.connect(lambda path=full_song_path: start_music_player(self,
+                                                                                       path,
+                                                                                       self.music_player,
+                                                                                       playlists_name))
             self.main_layout.addWidget(song_button)
 
     def show_playlists(self):

@@ -2,12 +2,11 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPu
 import os
 
 
-def start_music_player(parent, file_name, music_player):
-    parent.replace_widgets_to_player()
+def start_music_player(parent, file_name, music_player, playlist=None):
+    parent.replace_widgets_to_player(playlist)
     player = music_player
     player.set_path(file_name)
     parent.layout().addWidget(player)
-    print(file_name)
 
 
 def open_file(self, parent, music_player):
@@ -83,7 +82,7 @@ def remove_playlist(playlist_to_delete):
         with open(playlists_path, 'r') as file:
             playlists = file.readlines()
 
-        # Remove the specified playlist path
+        # remove the specified playlist path
         playlists = [playlist.strip() for playlist in playlists if playlist.strip() != playlist_to_delete]
 
         with open(playlists_path, 'w') as file:
