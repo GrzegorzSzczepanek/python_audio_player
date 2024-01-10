@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         self.main_layout = QVBoxLayout(self.central_widget)
 
         self.max_width = int(self.width)
-        self.max_height = int(self.height * 0.22)
+        self.max_height = int(self.height * 0.4)
         self.music_player = AudioPlayer(self.max_width, self.max_height)
 
         self.make_widgets()
@@ -122,6 +122,6 @@ class MainWindow(QMainWindow):
 
         if playlists_names:
             for playlists_name in playlists_names:
-                playlist_button = SongButton(playlists_name, parent=self)
+                playlist_button = SongButton(playlists_name.split("/")[-1], parent=self)
                 playlist_button.clicked.connect(lambda playlist=playlists_name: self.display_playlist_songs(playlist))
                 self.main_layout.addWidget(playlist_button)

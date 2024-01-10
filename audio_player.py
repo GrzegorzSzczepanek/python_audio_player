@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPu
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+from file_functions import get_playlist_songs
 
 
 class AudioPlayer(QWidget):
@@ -17,6 +18,10 @@ class AudioPlayer(QWidget):
         self.playButton = QPushButton('Play')
         self.playButton.clicked.connect(self.play)
 
+        self.next_button = QPushButton("next")
+
+        self.previous_button = QPushButton("previous")
+
         self.slider = QSlider(Qt.Horizontal)
         self.slider.sliderMoved.connect(self.set_position)
 
@@ -26,6 +31,8 @@ class AudioPlayer(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.song_label)
         layout.addWidget(self.playButton)
+        layout.addWidget(self.next_button)
+        layout.addWidget(self.previous_button)
         layout.addWidget(self.slider)
         layout.addWidget(self.time_label)
 
@@ -41,6 +48,9 @@ class AudioPlayer(QWidget):
         self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
         self.mediaPlayer.mediaStatusChanged.connect(self.on_media_status_changed)
         self.play()
+
+        self.next_button.clicked.connect(lambda x=path: self.next_song(path))
+        self.previous_button.clicked.connect(lambda x=path: self.previous_song(path))
 
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)
 
@@ -67,6 +77,50 @@ class AudioPlayer(QWidget):
 
     def set_position(self, position):
         self.mediaPlayer.setPosition(position * 1000)
+
+    def next_song(self, path, custom_playlist=None):
+        playlist_path = "/".join(path.split("/")[0:-1])
+        current_song = path.split("/")[-1]
+        playlist_songs = get_playlist_songs(playlist_path)
+
+        try:
+            current_song_index = playlist_songs.index(current_song)
+            next_song_index = current_song_index + 1
+            if next_song_index == len(playlist_songs):
+                next_song_index = 0  # current song was last one in playlist
+                next_song = playlist_songs[next_song_index]
+            else:
+                next_song_index = current_song_index + 1
+                next_song = playlist_songs[next_song_index]
+
+            next_song_path = f"{playlist_path}/{next_song}"
+            self.set_path(next_song_path)
+
+        except Exception as e:
+            print(f"\n\neeror: {str(e)}")
+
+    def previous_song(self, path, custom_playlist=None):
+        playlist_path = "/".join(path.split("/")[0:-1])
+        current_song = path.split("/")[-1]
+        playlist_songs = get_playlist_songs(playlist_path)
+
+        try:
+            current_song_index = playlist_songs.index(current_song)
+            next_song_index = current_song_index + 1
+            if next_song_index == 0:
+                next_song_index = len(playlist_songs) - 1  # current song was first in playlist
+                next_song = playlist_songs[next_song_index]
+            else:
+                next_song_index = current_song_index - 1
+                next_song = playlist_songs[next_song_index]
+
+            next_song_path = f"{playlist_path}/{next_song}"
+            self.set_path(next_song_path)
+
+        except Exception as e:
+            print(f"\n\neeror: {str(e)}")
+
+
 
     def update_slider(self):
         position = self.mediaPlayer.position()

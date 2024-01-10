@@ -61,6 +61,7 @@ def add_playlist(self, new_playlist_path):
 def get_playlist_songs(name):
     playlist_path = os.path.expanduser("~/.local/share/PyPlayer/")
     playlist_path = os.path.join(playlist_path, name)
+    print(playlist_path)
 
     if not os.path.exists(playlist_path):
         print(f"Playlist '{name}' not found at '{playlist_path}'.")
