@@ -39,21 +39,19 @@ class MainWindow(QMainWindow):
             self.main_layout.itemAt(i).widget().setParent(None)
 
     def reset_player(self):
-        pass
-
-    def replace_player_to_widgets(self):
-        self.remove_widgets()
-
-        self.main_layout.removeWidget(self.music_player)
-        self.music_player.setParent(None)
-        self.music_player = None
-        self.make_widgets()
-
-    def song_back_button(self, playlist):
         self.main_layout.removeWidget(self.music_player)
         self.music_player.setParent(None)
         self.music_player = None
         self.music_player = AudioPlayer(self.max_width, self.max_height)
+
+    def replace_player_to_widgets(self):
+        self.remove_widgets()
+        self.reset_player()
+        self.make_widgets()
+
+    def song_back_button(self, playlist):
+        self.reset_player()
+        self.main_layout.removeWidget(self.music_player)
         self.display_playlist_songs(playlist)
 
     def replace_widgets_to_player(self, playlist=None):
@@ -62,7 +60,7 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.music_player)
         self.back_to_menu_button = SongButton("Go Back", parent=self)
         if playlist:
-            self.back_to_menu_button.clicked.connect(lambda: self.song_back_button(playlist))
+            self.back_to_menu_button.clicked.connect(lambda x=playlist: self.song_back_button(x))
         else:
             self.back_to_menu_button.clicked.connect(lambda: self.replace_player_to_widgets())
         self.main_layout.addWidget(self.back_to_menu_button)
@@ -80,11 +78,13 @@ class MainWindow(QMainWindow):
 
     def replace_songs_to_playlists(self):
         self.remove_widgets()
+        self.reset_player()
         self.show_playlists()
 
     def song_to_playlist_after_removing(self, path):
         self.remove_widgets()
         remove_playlist(path)
+        self.reset_player()
         self.show_playlists()
 
     def display_playlist_songs(self, playlists_name):

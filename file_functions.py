@@ -54,6 +54,7 @@ def add_playlist(self, new_playlist_path):
             with open(playlists_path, "a") as append_file:
                 append_file.write(f"{new_playlist_path}\n")
 
+        print(file.read())
     self.remove_widgets()
     self.show_playlists()
 

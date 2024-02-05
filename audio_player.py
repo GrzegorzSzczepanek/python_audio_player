@@ -19,7 +19,6 @@ class AudioPlayer(QWidget):
         self.playButton.clicked.connect(self.play)
 
         self.next_button = QPushButton("next")
-
         self.previous_button = QPushButton("previous")
 
         self.slider = QSlider(Qt.Horizontal)
@@ -28,15 +27,15 @@ class AudioPlayer(QWidget):
         self.time_label = QLabel()
         self.song_label = QLabel()
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.song_label)
-        layout.addWidget(self.playButton)
-        layout.addWidget(self.next_button)
-        layout.addWidget(self.previous_button)
-        layout.addWidget(self.slider)
-        layout.addWidget(self.time_label)
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.song_label)
+        self.layout.addWidget(self.playButton)
+        self.layout.addWidget(self.next_button)
+        self.layout.addWidget(self.previous_button)
+        self.layout.addWidget(self.slider)
+        self.layout.addWidget(self.time_label)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
 
         self.timer = QTimer()
         self.timer.setInterval(1000)
@@ -44,18 +43,35 @@ class AudioPlayer(QWidget):
 
         self.mediaPlayer.stateChanged.connect(self.media_state_changed)
 
-    def set_path(self, path):
+    def play_song(self, path):
         self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
         self.mediaPlayer.mediaStatusChanged.connect(self.on_media_status_changed)
         self.play()
-
-        self.next_button.clicked.connect(lambda x=path: self.next_song(path))
-        self.previous_button.clicked.connect(lambda x=path: self.previous_song(path))
-
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)
 
         song_name = path.split("/")[-1]
         self.song_label.setText(song_name)
+
+    def reset_buttons(self):
+        self.layout.removeWidget(self.previous_button)
+        self.previous_button.setParent(None)
+        self.previous_button = None
+        self.previous_button = QPushButton("Previous")
+
+        self.layout.removeWidget(self.next_button)
+        self.next_button.setParent(None)
+        self.next_button = None
+        self.next_button = QPushButton("Next")
+
+        self.layout.addWidget(self.previous_button)
+        self.layout.addWidget(self.next_button)
+
+    def init_buttons(self, path):
+        self.next_button.clicked.connect(lambda x=path: self.next_song(x))
+        self.previous_button.clicked.connect(lambda x=path: self.previous_song(x))
+
+    def set_path(self, path):
+        self.play_song(path)
 
     def on_media_status_changed(self, status):
         if status == QMediaPlayer.LoadedMedia:
@@ -79,6 +95,7 @@ class AudioPlayer(QWidget):
         self.mediaPlayer.setPosition(position * 1000)
 
     def next_song(self, path, custom_playlist=None):
+        self.current_song_path = path
         playlist_path = "/".join(path.split("/")[0:-1])
         current_song = path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
@@ -100,6 +117,7 @@ class AudioPlayer(QWidget):
             print(f"\n\neeror: {str(e)}")
 
     def previous_song(self, path, custom_playlist=None):
+        self.current_song_path = path
         playlist_path = "/".join(path.split("/")[0:-1])
         current_song = path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
@@ -119,8 +137,6 @@ class AudioPlayer(QWidget):
 
         except Exception as e:
             print(f"\n\neeror: {str(e)}")
-
-
 
     def update_slider(self):
         position = self.mediaPlayer.position()
