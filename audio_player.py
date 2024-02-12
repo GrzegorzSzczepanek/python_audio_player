@@ -21,8 +21,13 @@ class AudioPlayer(QWidget):
         self.next_button = QPushButton("next")
         self.previous_button = QPushButton("previous")
 
+        self.next_button.clicked.connect(self.next_song)
+        self.previous_button.clicked.connect(self.previous_song)
+
         self.slider = QSlider(Qt.Horizontal)
         self.slider.sliderMoved.connect(self.set_position)
+
+        self.song_path = ""  # It'll be changed later when user will choose a song. It allows to avoid some bugs
 
         self.time_label = QLabel()
         self.song_label = QLabel()
@@ -71,6 +76,7 @@ class AudioPlayer(QWidget):
         self.previous_button.clicked.connect(lambda x=path: self.previous_song(x))
 
     def set_path(self, path):
+        self.song_path = path
         self.play_song(path)
 
     def on_media_status_changed(self, status):
@@ -94,10 +100,10 @@ class AudioPlayer(QWidget):
     def set_position(self, position):
         self.mediaPlayer.setPosition(position * 1000)
 
-    def next_song(self, path, custom_playlist=None):
-        self.current_song_path = path
-        playlist_path = "/".join(path.split("/")[0:-1])
-        current_song = path.split("/")[-1]
+    def next_song(self, custom_playlist=None):
+        self.current_song_path = self.song_path
+        playlist_path = "/".join(self.song_path.split("/")[0:-1])
+        current_song = self.song_path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
 
         try:
@@ -116,16 +122,15 @@ class AudioPlayer(QWidget):
         except Exception as e:
             print(f"\n\neeror: {str(e)}")
 
-    def previous_song(self, path, custom_playlist=None):
-        self.current_song_path = path
-        playlist_path = "/".join(path.split("/")[0:-1])
-        current_song = path.split("/")[-1]
+    def previous_song(self, custom_playlist=None):
+        self.current_song_path = self.song_path
+        playlist_path = "/".join(self.song_path.split("/")[0:-1])
+        current_song = self.song_path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
 
         try:
             current_song_index = playlist_songs.index(current_song)
-            next_song_index = current_song_index + 1
-            if next_song_index == 0:
+            if current_song_index == 0:
                 next_song_index = len(playlist_songs) - 1  # current song was first in playlist
                 next_song = playlist_songs[next_song_index]
             else:

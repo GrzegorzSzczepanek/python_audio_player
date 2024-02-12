@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from main_window import MainWindow
+from window import MainWindow
 from file_functions import remove_playlist
 
 
