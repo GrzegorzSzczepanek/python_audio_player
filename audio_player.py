@@ -1,7 +1,9 @@
+# TODO queues for songs, automatic search for songs from all of computer
 from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox, QScrollArea
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+import random
 from file_functions import get_playlist_songs
 
 
@@ -27,6 +29,18 @@ class AudioPlayer(QWidget):
         self.slider = QSlider(Qt.Horizontal)
         self.slider.sliderMoved.connect(self.set_position)
 
+        self.autoplay = False
+        self.shuffle = False
+        self.loop = False
+
+        self.autoplay_check = QCheckBox('Autoplay')
+        self.shuffle_check = QCheckBox('Shuffle')
+        self.loop_check = QCheckBox('Loop')
+
+        self.autoplay_check.stateChanged.connect(self.on_autoplay_changed)
+        self.shuffle_check.stateChanged.connect(self.on_shuffle_changed)
+        self.loop_check.stateChanged.connect(self.on_loop_changed)
+
         self.song_path = ""  # It'll be changed later when user will choose a song. It allows to avoid some bugs
 
         self.time_label = QLabel()
@@ -39,6 +53,9 @@ class AudioPlayer(QWidget):
         self.layout.addWidget(self.previous_button)
         self.layout.addWidget(self.slider)
         self.layout.addWidget(self.time_label)
+        self.layout.addWidget(self.autoplay_check)
+        self.layout.addWidget(self.loop_check)
+        self.layout.addWidget(self.shuffle_check)
 
         self.setLayout(self.layout)
 
@@ -47,6 +64,15 @@ class AudioPlayer(QWidget):
         self.timer.timeout.connect(self.update_slider)
 
         self.mediaPlayer.stateChanged.connect(self.media_state_changed)
+
+    def on_autoplay_changed(self, state):
+        self.autoplay = state == Qt.Checked
+
+    def on_shuffle_changed(self, state):
+        self.shuffle = state == Qt.Checked
+
+    def on_loop_changed(self, state):
+        self.loop = state == Qt.Checked
 
     def play_song(self, path):
         self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
@@ -87,6 +113,11 @@ class AudioPlayer(QWidget):
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
             self.mediaPlayer.pause()
+        # TODO fix this autoplay
+        elif self.autoplay and self.mediaPlayer.state() == QMediaPlayer.StoppedState:
+            self.mediaPlayer.play()
+            self.timer.start()
+            self.next_song()
         else:
             self.mediaPlayer.play()
             self.timer.start()
@@ -106,6 +137,8 @@ class AudioPlayer(QWidget):
         current_song = self.song_path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
 
+        if self.shuffle:
+            random.shuffle(playlist_songs)
         try:
             current_song_index = playlist_songs.index(current_song)
             next_song_index = current_song_index + 1
@@ -128,6 +161,9 @@ class AudioPlayer(QWidget):
         current_song = self.song_path.split("/")[-1]
         playlist_songs = get_playlist_songs(playlist_path)
 
+        if self.shuffle:
+            random.shuffle(playlist_songs)
+
         try:
             current_song_index = playlist_songs.index(current_song)
             if current_song_index == 0:
@@ -149,3 +185,4 @@ class AudioPlayer(QWidget):
         self.slider.setValue(position // 1000)
         self.time_label.setText(
             f"{position // 60000}:{'0' if (position // 1000) % 60 < 10 else ''}{(position // 1000) % 60}")
+        print(int(self.slider.maximum()))
