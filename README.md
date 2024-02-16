@@ -19,7 +19,7 @@ Python Audio Player is a simple yet powerful music player application built with
 
 Clone the repository and navigate to the project directory:
 
-`git clone https://github.com/GrzegorzSzczepanek/python_audio_player.git cd python_audio_player`
+`git clone https://github.com/GrzegorzSzczepanek/python_audio_player.git || cd python_audio_player`
 
 
 Install the required dependencies:
