@@ -79,7 +79,7 @@ class AudioPlayer(QWidget):
         self.mediaPlayer.mediaStatusChanged.connect(self.on_media_status_changed)
         self.play()
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)
-
+        # print(self.slider.maximum())
         song_name = path.split("/")[-1]
         self.song_label.setText(song_name)
 
@@ -113,11 +113,6 @@ class AudioPlayer(QWidget):
     def play(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
             self.mediaPlayer.pause()
-        # TODO fix this autoplay
-        elif self.autoplay and self.mediaPlayer.state() == QMediaPlayer.StoppedState:
-            self.mediaPlayer.play()
-            self.timer.start()
-            self.next_song()
         else:
             self.mediaPlayer.play()
             self.timer.start()
@@ -185,4 +180,9 @@ class AudioPlayer(QWidget):
         self.slider.setValue(position // 1000)
         self.time_label.setText(
             f"{position // 60000}:{'0' if (position // 1000) % 60 < 10 else ''}{(position // 1000) % 60}")
-        print(int(self.slider.maximum()))
+        # print(int(self.slider.maximum()))
+        if self.autoplay is True and self.slider.value() == self.slider.maximum():
+            self.next_song()
+        elif self.loop is True and self.slider.value() == self.slider.maximum():
+            self.set_position(0)
+            self.play()
