@@ -1,5 +1,7 @@
 # TODO queues for songs, automatic search for songs from all of computer
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy, QCheckBox, QScrollArea
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, \
+    QPushButton, QLabel, QSlider, \
+    QCheckBox
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -79,7 +81,6 @@ class AudioPlayer(QWidget):
         self.mediaPlayer.mediaStatusChanged.connect(self.on_media_status_changed)
         self.play()
         self.slider.setMaximum(self.mediaPlayer.duration() // 1000)
-        # print(self.slider.maximum())
         song_name = path.split("/")[-1]
         self.song_label.setText(song_name)
 

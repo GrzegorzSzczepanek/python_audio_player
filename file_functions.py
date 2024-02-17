@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QVBoxLayout, QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy
+from PyQt5.QtWidgets import (QApplication, QWidget, QFileDialog, QVBoxLayout,
+                             QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy)
 import os
 
 
