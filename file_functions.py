@@ -55,9 +55,31 @@ def add_playlist(self, new_playlist_path):
             with open(playlists_path, "a") as append_file:
                 append_file.write(f"{new_playlist_path}\n")
 
-        print(file.read())
     self.remove_widgets()
     self.show_playlists()
+
+
+def create_playlist(playlist_name):
+    playlist_path = os.path.expanduser("~/.local/share/PyPlayer/")
+    # Create created_playlists directory if it doesn't exist
+    created_playlists_path = os.path.join(playlist_path, "created_playlists")
+    if not os.path.exists(created_playlists_path):
+        os.makedirs(created_playlists_path)
+
+    # Create the file with the provided playlist name
+    playlist_file_path = os.path.join(created_playlists_path, f"{playlist_name}.txt")
+    with open(playlist_file_path, 'w') as playlist_file:
+        playlist_file.write("")
+
+
+def add_song_to_playlist(self, playlist_name: str, path_to_song: str):
+    playlist_path = os.path.expanduser("~/.local/share/PyPlayer/created_playlists/")
+    playlist_path = os.path.join(playlist_path, playlist_name)
+
+    with open(playlist_path, "r") as file:
+        if playlist_path not in file.read():
+            with open(playlist_path, "a") as append_file:
+                append_file.write(f"{path_to_song}\n")
 
 
 def get_playlist_songs(name):

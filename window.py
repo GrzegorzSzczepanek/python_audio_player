@@ -1,7 +1,7 @@
 from file_functions import (open_file, open_directory, check_playlists_path,
-                            add_playlist, get_playlist_songs, start_music_player)
-from PyQt5.QtWidgets import (QApplication, QWidget, QFileDialog, QVBoxLayout, QScrollArea,
-                             QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy)
+                            add_playlist, get_playlist_songs, start_music_player,
+                            create_playlist, check_created_playlists_path)
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QMainWindow, QInputDialog
 from audio_player import AudioPlayer
 from customizable_button import SongButton
 from file_functions import remove_playlist
@@ -19,7 +19,6 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Python Music Player")
         self.width, self.height = 500, 500
-        # self.resize(False, False)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -126,9 +125,18 @@ class MainWindow(QMainWindow):
 
         self.main_layout.addWidget(scroll_area)
 
+    def name_the_playlist(self):
+        text, ok = QInputDialog.getText(self, 'New Playlist', 'Enter playlist name:')
+        if ok:
+            playlist_name = text
+            create_playlist(playlist_name)
+        print(playlist_name)
+        # return playlist_name
+
     def show_playlists(self):
         self.remove_widgets()
         playlists_names = check_playlists_path()
+        created_playlists_path = check_created_playlists_path()
 
         scroll_area = QScrollArea()
         scroll_area.setFixedSize(self.width, self.height)
@@ -136,7 +144,7 @@ class MainWindow(QMainWindow):
         playlist_widget = QWidget()
         playlist_layout = QVBoxLayout(playlist_widget)
 
-        self.add_playlist_button = SongButton("Add new playlist", parent=self)
+        self.add_playlist_button = SongButton("Add existing playlist", parent=self)
         self.add_playlist_button.clicked.connect(lambda: add_playlist(self, open_directory(self)))
         playlist_layout.addWidget(self.add_playlist_button)
 
@@ -144,7 +152,12 @@ class MainWindow(QMainWindow):
         self.back_to_menu_button.clicked.connect(lambda: self.replace_player_to_widgets())
         playlist_layout.addWidget(self.back_to_menu_button)
 
-        if playlists_names:
+        self.create_playlist_button = SongButton("Create new playlist", parent=self)
+        self.create_playlist_button.clicked.connect(lambda: self.name_the_playlist())
+        playlist_layout.addWidget(self.create_playlist_button)
+
+        if playlists_names or created_playlists_path:
+            every_playlist_names = playlists_names + created_playlists_path
             for playlists_name in playlists_names:
                 playlist_button = SongButton(playlists_name.split("/")[-1], parent=self)
                 playlist_button.clicked.connect(lambda playlist=playlists_name: self.display_playlist_songs(playlist))

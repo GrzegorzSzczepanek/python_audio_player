@@ -181,7 +181,6 @@ class AudioPlayer(QWidget):
         self.slider.setValue(position // 1000)
         self.time_label.setText(
             f"{position // 60000}:{'0' if (position // 1000) % 60 < 10 else ''}{(position // 1000) % 60}")
-        # print(int(self.slider.maximum()))
         if self.autoplay is True and self.slider.value() == self.slider.maximum():
             self.next_song()
         elif self.loop is True and self.slider.value() == self.slider.maximum():
