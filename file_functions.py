@@ -10,6 +10,11 @@ def start_music_player(parent, file_name, music_player, playlist=None):
     parent.layout().addWidget(player)
 
 
+def find_all_songs():
+    file_paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk('/home/grzesiek/Music') for f in filenames if f.endswith(('.mp3', '.wav', '.flac'))]
+    return file_paths
+
+
 def open_file(self, parent, music_player):
     options = QFileDialog.Options()
     options |= QFileDialog.ReadOnly
@@ -35,7 +40,6 @@ def check_playlists_path():
     playlists_path = os.path.join(playlists_path, playlists_file)
 
     if os.path.isfile(playlists_path):
-
         with open(playlists_path, "r") as file:
             playlists = list(map(lambda x: x.replace("\n", ""), file.readlines()))
         return playlists
@@ -72,7 +76,7 @@ def create_playlist(playlist_name):
         playlist_file.write("")
 
 
-def add_song_to_playlist(self, playlist_name: str, path_to_song: str):
+def add_song_to_playlist(playlist_name: str, path_to_song: str):
     playlist_path = os.path.expanduser("~/.local/share/PyPlayer/created_playlists/")
     playlist_path = os.path.join(playlist_path, playlist_name)
 

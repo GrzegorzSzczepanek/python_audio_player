@@ -1,6 +1,6 @@
 from file_functions import (open_file, open_directory, check_playlists_path,
                             add_playlist, get_playlist_songs, start_music_player,
-                            create_playlist, check_created_playlists_path)
+                            create_playlist, find_all_songs)
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QMainWindow, QInputDialog
 from audio_player import AudioPlayer
 from customizable_button import SongButton
@@ -64,7 +64,6 @@ class MainWindow(QMainWindow):
 
     def make_widgets(self):
         scroll_area = QScrollArea()
-        scroll_area.setFixedSize(self.width, self.height)
 
         playlist_widget = QWidget()
         playlist_layout = QVBoxLayout(playlist_widget)
@@ -77,6 +76,10 @@ class MainWindow(QMainWindow):
         self.file_dialog.clicked.connect(lambda: open_file(self.file_dialog, self, self.music_player))
         playlist_layout.addWidget(self.file_dialog)
 
+        self.file_dialog = SongButton("See all songs in Music folder", parent=self)
+        self.file_dialog.clicked.connect(lambda: self.display_all_songs(all_songs=find_all_songs()))
+        playlist_layout.addWidget(self.file_dialog)
+
         scroll_area.setWidget(playlist_widget)
         scroll_area.setWidgetResizable(True)
 
@@ -87,18 +90,17 @@ class MainWindow(QMainWindow):
         self.reset_player()
         self.show_playlists()
 
-    def song_to_playlist_after_removing(self, path):
+    def song_to_playlist_after_removing(self, path: str):
         self.remove_widgets()
         remove_playlist(path)
         self.reset_player()
         self.show_playlists()
 
-    def display_playlist_songs(self, playlists_name):
-        songs = get_playlist_songs(playlists_name)
+    def display_playlist_songs(self, playlists_path: str, all_songs: list = None):
+        songs = get_playlist_songs(playlists_path) if not all_songs else all_songs
         self.remove_widgets()
 
         scroll_area = QScrollArea()
-        scroll_area.setFixedSize(self.width, self.height)
 
         song_widget = QWidget()
         song_layout = QVBoxLayout(song_widget)
@@ -107,17 +109,43 @@ class MainWindow(QMainWindow):
         self.back_to_playlist_button.clicked.connect(lambda: self.replace_songs_to_playlists())
         song_layout.addWidget(self.back_to_playlist_button)
 
-        self.remove_playlist_button = SongButton("Remove this playlist", parent=self)
-        self.remove_playlist_button.clicked.connect(lambda: self.song_to_playlist_after_removing(playlists_name))
-        song_layout.addWidget(self.remove_playlist_button)
+        if not all_songs:
+            self.remove_playlist_button = SongButton("Remove this playlist", parent=self)
+            self.remove_playlist_button.clicked.connect(lambda: self.song_to_playlist_after_removing(playlists_path))
+            song_layout.addWidget(self.remove_playlist_button)
 
         for song in songs:
-            full_song_path = f"{playlists_name}/{song}"
+            full_song_path = f"{playlists_path}/{song}"
             song_button = SongButton(song, parent=self)
             song_button.clicked.connect(lambda path=full_song_path: start_music_player(self,
                                                                                        path,
                                                                                        self.music_player,
-                                                                                       playlists_name))
+                                                                                       playlists_path))
+            song_layout.addWidget(song_button)
+
+        scroll_area.setWidget(song_widget)
+        scroll_area.setWidgetResizable(True)
+
+        self.main_layout.addWidget(scroll_area)
+
+    def display_all_songs(self, all_songs: list):
+        self.remove_widgets()
+
+        scroll_area = QScrollArea()
+
+        song_widget = QWidget()
+        song_layout = QVBoxLayout(song_widget)
+
+        self.back_button = SongButton("Go Back", parent=self)
+        self.back_button.clicked.connect(lambda: self.make_widgets())
+        song_layout.addWidget(self.back_button)
+
+        for song in all_songs:
+            song_button = SongButton(song, parent=self)
+            song_button.clicked.connect(lambda: start_music_player(self,
+                                                                   song,
+                                                                   self.music_player,
+                                                                   all_songs))
             song_layout.addWidget(song_button)
 
         scroll_area.setWidget(song_widget)
@@ -136,10 +164,9 @@ class MainWindow(QMainWindow):
     def show_playlists(self):
         self.remove_widgets()
         playlists_names = check_playlists_path()
-        created_playlists_path = check_created_playlists_path()
+        # created_playlists_path = check_created_playlists_path()
 
         scroll_area = QScrollArea()
-        scroll_area.setFixedSize(self.width, self.height)
 
         playlist_widget = QWidget()
         playlist_layout = QVBoxLayout(playlist_widget)
@@ -156,8 +183,7 @@ class MainWindow(QMainWindow):
         self.create_playlist_button.clicked.connect(lambda: self.name_the_playlist())
         playlist_layout.addWidget(self.create_playlist_button)
 
-        if playlists_names or created_playlists_path:
-            every_playlist_names = playlists_names + created_playlists_path
+        if playlists_names:
             for playlists_name in playlists_names:
                 playlist_button = SongButton(playlists_name.split("/")[-1], parent=self)
                 playlist_button.clicked.connect(lambda playlist=playlists_name: self.display_playlist_songs(playlist))

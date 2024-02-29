@@ -43,7 +43,7 @@ class AudioPlayer(QWidget):
         self.shuffle_check.stateChanged.connect(self.on_shuffle_changed)
         self.loop_check.stateChanged.connect(self.on_loop_changed)
 
-        self.song_path = ""  # It'll be changed later when user will choose a song. It allows to avoid some bugs
+        self.song_path = ""  # It'll be changed later when user will choose a song.
 
         self.time_label = QLabel()
         self.song_label = QLabel()
