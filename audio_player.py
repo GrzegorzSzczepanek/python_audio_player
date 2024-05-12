@@ -10,11 +10,8 @@ from file_functions import get_playlist_songs
 
 
 class AudioPlayer(QWidget):
-    def __init__(self, max_width, max_height):
+    def __init__(self):
         super().__init__()
-
-        self.setMaximumHeight(max_height)
-        self.setMaximumWidth(max_width)
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVideoOutput(QVideoWidget())
