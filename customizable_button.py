@@ -25,7 +25,6 @@ class SongButton(QWidget):
                     color: white;
                     padding: 12px 20px;
                     margin: 20px;
-                    max-width: 300px;
                 }
                 QPushButton:hover {
                     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.6, y2:0, stop:0 #007bff, stop:1 #0056b3);

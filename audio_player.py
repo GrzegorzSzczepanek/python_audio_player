@@ -1,4 +1,3 @@
-# TODO queues for songs, automatic search for songs from all of computer
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, \
     QPushButton, QLabel, QSlider, \
     QCheckBox

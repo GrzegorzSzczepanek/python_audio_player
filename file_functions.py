@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import (QApplication, QWidget, QFileDialog, QVBoxLayout,
-                             QPushButton, QLabel, QMainWindow, QSlider, QSizePolicy)
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 import os
 
 
@@ -11,7 +10,8 @@ def start_music_player(parent, file_name, music_player, playlist=None):
 
 
 def find_all_songs():
-    file_paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk('/home/grzesiek/Music') for f in filenames if f.endswith(('.mp3', '.wav', '.flac'))]
+    file_paths = [os.path.join(dp, f) for dp, dn, filenames in os.walk('/home/grzesiek/Music')
+                  for f in filenames if f.endswith(('.mp3', '.wav', '.flac'))]
     return file_paths
 
 

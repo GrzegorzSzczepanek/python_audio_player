@@ -1,8 +1,12 @@
+import sys
 from PyQt5.QtWidgets import QApplication
 from window import MainWindow
+import os
+os.environ['QT_QPA_PLATFORM'] = 'wayland'
+
 
 if __name__ == '__main__':
-    app = QApplication([])
+    app = QApplication(sys.argv)
     app.setStyleSheet("""
     QWidget {
         background-color: #333;
@@ -41,6 +45,7 @@ if __name__ == '__main__':
         height: 13px;
     }
 """)
+
     main_window = MainWindow()
     main_window.show()
     app.exec_()
